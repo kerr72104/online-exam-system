@@ -31,23 +31,14 @@ class QuestionController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'body'               => 'required|string',
-            'subject_id'         => 'required|exists:subjects,id',
-            'choices'            => 'required|array|size:4',
-            'choices.*.body'     => 'required|string',
-            'choices.*.is_correct' => 'nullable|boolean',
+            'body'           => 'required|string',
+            'subject_id'     => 'required|exists:subjects,id',
+            'correct_index'  => 'required|integer|min:0|max:3', // Validates the radio button
+            'choices'        => 'required|array|size:4',
+            'choices.*.body' => 'required|string',
+        ], [
+            'correct_index.required' => 'Exactly one correct answer must be selected.'
         ]);
-
-        // Ensure exactly one correct answer
-        $correctCount = collect($validated['choices'])->filter(
-            fn($c) => !empty($c['is_correct'])
-        )->count();
-
-        if ($correctCount !== 1) {
-            return back()
-                ->withInput()
-                ->withErrors(['choices' => 'Exactly one correct answer must be selected.']);
-        }
 
         $question = Question::create([
             'body'       => $validated['body'],
@@ -55,10 +46,11 @@ class QuestionController extends Controller
             'teacher_id' => Auth::id(),
         ]);
 
-        foreach ($validated['choices'] as $choice) {
+        foreach ($validated['choices'] as $index => $choice) {
             $question->choices()->create([
                 'body'       => $choice['body'],
-                'is_correct' => !empty($choice['is_correct']),
+                // If the current loop index matches the radio button value, it's correct
+                'is_correct' => $index === (int) $validated['correct_index'],
             ]);
         }
 
@@ -78,22 +70,14 @@ class QuestionController extends Controller
         $this->authorize('update', $question);
 
         $validated = $request->validate([
-            'body'                 => 'required|string',
-            'subject_id'           => 'required|exists:subjects,id',
-            'choices'              => 'required|array|size:4',
-            'choices.*.body'       => 'required|string',
-            'choices.*.is_correct' => 'nullable|boolean',
+            'body'           => 'required|string',
+            'subject_id'     => 'required|exists:subjects,id',
+            'correct_index'  => 'required|integer|min:0|max:3',
+            'choices'        => 'required|array|size:4',
+            'choices.*.body' => 'required|string',
+        ], [
+            'correct_index.required' => 'Exactly one correct answer must be selected.'
         ]);
-
-        $correctCount = collect($validated['choices'])->filter(
-            fn($c) => !empty($c['is_correct'])
-        )->count();
-
-        if ($correctCount !== 1) {
-            return back()
-                ->withInput()
-                ->withErrors(['choices' => 'Exactly one correct answer must be selected.']);
-        }
 
         $question->update([
             'body'       => $validated['body'],
@@ -102,10 +86,10 @@ class QuestionController extends Controller
 
         // Delete old choices and recreate
         $question->choices()->delete();
-        foreach ($validated['choices'] as $choice) {
+        foreach ($validated['choices'] as $index => $choice) {
             $question->choices()->create([
                 'body'       => $choice['body'],
-                'is_correct' => !empty($choice['is_correct']),
+                'is_correct' => $index === (int) $validated['correct_index'],
             ]);
         }
 

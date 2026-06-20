@@ -5,10 +5,8 @@
     <div class="max-w-2xl mx-auto px-4 sm:px-6 py-8">
         <h1 class="text-2xl font-semibold text-[#880000] mb-6">Add Question</h1>
 
-        @if($errors->has('choices'))
-            <div class="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded mb-6 text-sm font-medium">
-                {{ $errors->first('choices') }}
-            </div>
+        @if($errors->has('correct_index')) <div class="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded mb-6 text-sm font-medium">
+                {{ $errors->first('correct_index') }} </div>
         @endif
 
         <div class="bg-white rounded-xl border border-gray-100 p-6 sm:p-8">
