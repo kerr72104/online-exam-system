@@ -3,6 +3,11 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Models\Exam;
+use App\Models\Question;
+use App\Policies\ExamPolicy;
+use App\Policies\QuestionPolicy;
+use Illuminate\Support\Facades\Gate;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Gate::policy(Exam::class, ExamPolicy::class);
+        Gate::policy(Question::class, QuestionPolicy::class);
     }
 }

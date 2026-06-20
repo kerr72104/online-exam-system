@@ -3,63 +3,122 @@
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
+use App\Models\Question;
+use App\Models\Subject;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class QuestionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $questions = Question::with(['subject', 'choices'])
+            ->where('teacher_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        $subjects = Subject::where('teacher_id', Auth::id())->orderBy('code')->get();
+
+        return view('teacher.questions.index', compact('questions', 'subjects'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $subjects = Subject::where('teacher_id', Auth::id())->orderBy('code')->get();
+        return view('teacher.questions.create', compact('subjects'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'body'               => 'required|string',
+            'subject_id'         => 'required|exists:subjects,id',
+            'choices'            => 'required|array|size:4',
+            'choices.*.body'     => 'required|string',
+            'choices.*.is_correct' => 'nullable|boolean',
+        ]);
+
+        // Ensure exactly one correct answer
+        $correctCount = collect($validated['choices'])->filter(
+            fn($c) => !empty($c['is_correct'])
+        )->count();
+
+        if ($correctCount !== 1) {
+            return back()
+                ->withInput()
+                ->withErrors(['choices' => 'Exactly one correct answer must be selected.']);
+        }
+
+        $question = Question::create([
+            'body'       => $validated['body'],
+            'subject_id' => $validated['subject_id'],
+            'teacher_id' => Auth::id(),
+        ]);
+
+        foreach ($validated['choices'] as $choice) {
+            $question->choices()->create([
+                'body'       => $choice['body'],
+                'is_correct' => !empty($choice['is_correct']),
+            ]);
+        }
+
+        return redirect()->route('teacher.questions.index')
+                         ->with('success', 'Question created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit(Question $question)
     {
-        //
+        $this->authorize('update', $question);
+        $subjects = Subject::where('teacher_id', Auth::id())->orderBy('code')->get();
+        return view('teacher.questions.edit', compact('question', 'subjects'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, Question $question)
     {
-        //
+        $this->authorize('update', $question);
+
+        $validated = $request->validate([
+            'body'                 => 'required|string',
+            'subject_id'           => 'required|exists:subjects,id',
+            'choices'              => 'required|array|size:4',
+            'choices.*.body'       => 'required|string',
+            'choices.*.is_correct' => 'nullable|boolean',
+        ]);
+
+        $correctCount = collect($validated['choices'])->filter(
+            fn($c) => !empty($c['is_correct'])
+        )->count();
+
+        if ($correctCount !== 1) {
+            return back()
+                ->withInput()
+                ->withErrors(['choices' => 'Exactly one correct answer must be selected.']);
+        }
+
+        $question->update([
+            'body'       => $validated['body'],
+            'subject_id' => $validated['subject_id'],
+        ]);
+
+        // Delete old choices and recreate
+        $question->choices()->delete();
+        foreach ($validated['choices'] as $choice) {
+            $question->choices()->create([
+                'body'       => $choice['body'],
+                'is_correct' => !empty($choice['is_correct']),
+            ]);
+        }
+
+        return redirect()->route('teacher.questions.index')
+                         ->with('success', 'Question updated successfully.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy(Question $question)
     {
-        //
-    }
+        $this->authorize('delete', $question);
+        $question->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('teacher.questions.index')
+                         ->with('success', 'Question deleted.');
     }
 }

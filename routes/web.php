@@ -28,11 +28,12 @@ Route::middleware('auth')->group(function () {
     });
 
     //Teacher
-    Route::middleware('role:teacher')->prefix('teacher')->group(function () {
+    Route::middleware('role:teacher')->prefix('teacher')->name('teacher.')->group(function () {
         Route::resource('questions', QuestionController::class);
         Route::resource('exams', ExamController::class);
-        Route::get('results', [ResultController::class, 'index']);
-        Route::get('results/{exam}', [ResultController::class, 'show']);
+        Route::post('exams/{exam}/publish', [ExamController::class, 'publish'])->name('exams.publish');
+        Route::get('results', [ResultController::class, 'index'])->name('results.index');
+        Route::get('results/{exam}', [ResultController::class, 'show'])->name('results.show');
     });
 
     //Student
