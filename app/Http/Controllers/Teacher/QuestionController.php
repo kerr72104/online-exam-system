@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreQuestionRequest;
 use App\Models\Question;
 use App\Models\Subject;
 use Illuminate\Http\Request;
@@ -28,17 +29,9 @@ class QuestionController extends Controller
         return view('teacher.questions.create', compact('subjects'));
     }
 
-    public function store(Request $request)
+    public function store(StoreQuestionRequest $request)
     {
-        $validated = $request->validate([
-            'body'           => 'required|string',
-            'subject_id'     => 'required|exists:subjects,id',
-            'correct_index'  => 'required|integer|min:0|max:3', // Validates the radio button
-            'choices'        => 'required|array|size:4',
-            'choices.*.body' => 'required|string',
-        ], [
-            'correct_index.required' => 'Exactly one correct answer must be selected.'
-        ]);
+        $validated = $request->validated();
 
         $question = Question::create([
             'body'       => $validated['body'],
@@ -69,15 +62,7 @@ class QuestionController extends Controller
     {
         $this->authorize('update', $question);
 
-        $validated = $request->validate([
-            'body'           => 'required|string',
-            'subject_id'     => 'required|exists:subjects,id',
-            'correct_index'  => 'required|integer|min:0|max:3',
-            'choices'        => 'required|array|size:4',
-            'choices.*.body' => 'required|string',
-        ], [
-            'correct_index.required' => 'Exactly one correct answer must be selected.'
-        ]);
+        $validated = $request->validated();
 
         $question->update([
             'body'       => $validated['body'],

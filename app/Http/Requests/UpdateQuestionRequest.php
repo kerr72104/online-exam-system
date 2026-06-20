@@ -12,7 +12,9 @@ class UpdateQuestionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        $question = $this->route('question');
+
+        return $this->user()->can('update', $question);
     }
 
     /**
@@ -23,7 +25,23 @@ class UpdateQuestionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'body'           => 'required|string',
+            'subject_id'     => 'required|exists:subjects,id',
+            'correct_index'  => 'required|integer|min:0|max:3',
+            'choices'        => 'required|array|size:4',
+            'choices.*.body' => 'required|string',
+        ];
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'correct_index.required' => 'Exactly one correct answer must be selected.',
         ];
     }
 }
