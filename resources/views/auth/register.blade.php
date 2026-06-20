@@ -1,89 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register — ExamSystem</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="min-h-screen bg-gray-100 flex items-center justify-center">
+@extends('layouts.app')
 
-    <div class="bg-white rounded-2xl shadow-lg w-full max-w-md p-8">
+@section('content')
+<div class="flex items-center justify-center py-12 px-4">
+    <div class="bg-white w-full max-w-md p-8 rounded-xl shadow-md">
+        
+        <div class="text-center mb-6">
+            <img src="{{ asset('PUPLogo.png') }}" alt="PUP Logo" class="w-16 h-16 mx-auto mb-3 object-cover rounded-full">
+            <h1 class="text-2xl font-bold text-[#880000]">Create an Account</h1>
+            <p class="text-gray-500 text-sm mt-1">Register as a student to get started</p>
+        </div>
 
-        <h1 class="text-2xl font-bold text-blue-800 mb-2">Create an Account</h1>
-        <p class="text-sm text-gray-500 mb-6">Register as a student to get started.</p>
-
-        <form method="POST" action="{{ route('register') }}">
+        <form method="POST" action="{{ route('register') }}" class="space-y-4">
             @csrf
-
-            {{-- Name --}}
-            <div class="mb-4">
+            
+            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                <input
-                    type="text"
-                    name="name"
-                    value="{{ old('name') }}"
-                    class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 @error('name') border-red-400 @enderror"
-                    required>
-                @error('name')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                @enderror
+                <input type="text" name="name" value="{{ old('name') }}" required
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2">
             </div>
 
-            {{-- Email --}}
-            <div class="mb-4">
+            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input
-                    type="email"
-                    name="email"
-                    value="{{ old('email') }}"
-                    class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 @error('email') border-red-400 @enderror"
-                    required>
-                @error('email')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                @enderror
+                <input type="email" name="email" value="{{ old('email') }}" required
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2">
             </div>
 
-            {{-- Password --}}
-            <div class="mb-4">
+            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                <input
-                    type="password"
-                    name="password"
-                    class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 @error('password') border-red-400 @enderror"
-                    required>
-                @error('password')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                @enderror
+                <input type="password" name="password" required
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2">
             </div>
 
-            {{-- Confirm Password --}}
-            <div class="mb-6">
+            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-                <input
-                    type="password"
-                    name="password_confirmation"
-                    class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required>
+                <input type="password" name="password_confirmation" required
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2">
             </div>
 
-            <button
-                type="submit"
-                class="w-full bg-blue-700 text-white py-2 rounded-lg text-sm font-semibold hover:bg-blue-800 transition">
+            <button type="submit" class="w-full bg-[#880000] text-white py-2.5 rounded-lg font-bold hover:bg-[#660000] mt-4 cursor-pointer">
                 Create Account
             </button>
         </form>
 
-        <p class="text-center text-sm text-gray-500 mt-4">
-            Already have an account?
-            <a href="{{ route('login') }}" class="text-blue-700 font-medium hover:underline">Login</a>
-        </p>
-
-        <p class="text-center text-sm text-gray-500 mt-2">
-            <a href="{{ route('landing') }}" class="text-gray-400 hover:underline">← Back to Home</a>
-        </p>
+        <div class="mt-6 pt-4 border-t border-gray-100 text-center text-sm">
+            <p class="text-gray-500">
+                Already have an account? 
+                <a href="{{ route('login') }}" class="text-[#880000] font-bold hover:underline">Login</a>
+            </p>
+            <a href="{{ route('landing') }}" class="block mt-3 text-gray-400 hover:text-gray-600">
+                &larr; Back to Home
+            </a>
+        </div>
 
     </div>
-
-</body>
-</html>
+</div>
+@endsection
