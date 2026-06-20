@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -14,13 +17,9 @@ class AuthController extends Controller
         return view('auth.register');
     }
 
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $validated = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email',
-            'password' => 'required|min:8|confirmed',
-        ]);
+        $validated = $request->validated();
 
         $user = User::create([
             'name'     => $validated['name'],
@@ -31,6 +30,11 @@ class AuthController extends Controller
 
         Auth::login($user);
 
+        Log::info('New student registered successfully.', [
+            'user_id' => $user->id,
+            'email'   => $user->email
+        ]);
+
         return redirect()->route('student.dashboard');
     }
 
@@ -39,12 +43,9 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $credentials = $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required',
-        ]);
+        $credentials = $request->validated();
 
         if (!Auth::attempt($credentials)) {
             return back()
@@ -53,6 +54,11 @@ class AuthController extends Controller
         }
 
         $request->session()->regenerate();
+    
+        Log::info('Student logged in successfully.', [
+            'user_id' => Auth::id(),
+            'email'   => Auth::user()->email
+        ]);
 
         return $this->redirectByRole(Auth::user()->role);
     }

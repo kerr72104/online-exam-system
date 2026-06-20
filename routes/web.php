@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\Student\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 // Public
@@ -17,24 +18,24 @@ Route::middleware('auth')->group(function () {
 
     // Admin
     Route::middleware('role:admin')->prefix('admin')->group(function () {
-        Route::resource('users', Admin\UserController::class);
-        Route::resource('subjects', Admin\SubjectController::class);
-        Route::resource('sections', Admin\SectionController::class);
+        Route::resource('users', UserController::class);
+        Route::resource('subjects', SubjectController::class);
+        Route::resource('sections', SectionController::class);
     });
 
     // Teacher
     Route::middleware('role:teacher')->prefix('teacher')->group(function () {
-        Route::resource('questions', Teacher\QuestionController::class);
-        Route::resource('exams', Teacher\ExamController::class);
-        Route::get('results', [Teacher\ResultController::class, 'index']);
-        Route::get('results/{exam}', [Teacher\ResultController::class, 'show']);
+        Route::resource('questions', QuestionController::class);
+        Route::resource('exams', ExamController::class);
+        Route::get('results', [ResultController::class, 'index']);
+        Route::get('results/{exam}', [ResultController::class, 'show']);
     });
 
     // Student
     Route::middleware('role:student')->prefix('student')->group(function () {
-        Route::get('dashboard', [Student\DashboardController::class, 'index']);
-        Route::get('exams/{exam}', [Student\ExamController::class, 'show']);
-        Route::post('exams/{exam}/start', [Student\ExamController::class, 'start']);
-        Route::post('exams/{exam}/submit', [Student\ExamController::class, 'submit']);
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('student.dashboard');
+        Route::get('exams/{exam}', [ExamController::class, 'show']);
+        Route::post('exams/{exam}/start', [ExamController::class, 'start']);
+        Route::post('exams/{exam}/submit', [ExamController::class, 'submit']);
     });
 });
