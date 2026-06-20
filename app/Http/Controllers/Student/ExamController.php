@@ -7,5 +7,12 @@ use Illuminate\Http\Request;
 
 class ExamController extends Controller
 {
-    //
+    public function results(){
+        return view('student.results');
+    }
+
+    public function show(Exam $exam){
+        return view('student.exams.show', compact('exam'));
+    }
+
 }
