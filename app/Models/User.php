@@ -2,23 +2,57 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
+    use HasFactory, Notifiable;
+
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'role',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // As a teacher
+    public function subjects()
+    {
+        return $this->hasMany(Subject::class, 'teacher_id');
+    }
+
+    public function exams()
+    {
+        return $this->hasMany(Exam::class, 'teacher_id');
+    }
+
+    public function questions()
+    {
+        return $this->hasMany(Question::class, 'teacher_id');
+    }
+
+    // As a student
+    public function sections()
+    {
+        return $this->belongsToMany(Section::class, 'section_student', 'student_id', 'section_id');
+    }
+
+    public function examSessions()
+    {
+        return $this->hasMany(ExamSession::class, 'student_id');
     }
 }
