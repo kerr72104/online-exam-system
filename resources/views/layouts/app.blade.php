@@ -11,7 +11,7 @@
     @if(request()->routeIs('student.exams.*')) 
         @include('partials.header-exam')
     @elseif(auth()->check()) 
-        @include('partials.header-dashboard')
+        @include('partials.header')
     @else 
         @include('partials.header-landing')
     @endif

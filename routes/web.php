@@ -1,9 +1,14 @@
 <?php
 
+use App\Http\Controllers\Admin\SectionController;
+use App\Http\Controllers\Admin\SubjectController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Student\DashboardController;
 use App\Http\Controllers\Student\ExamController;
+use App\Http\Controllers\Teacher\QuestionController;
+use App\Http\Controllers\Teacher\ResultController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LandingController::class, 'index'])->name('landing');
@@ -16,7 +21,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
 
     //Admin
-    Route::middleware('role:admin')->prefix('admin')->group(function () {
+    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::resource('users', UserController::class);
         Route::resource('subjects', SubjectController::class);
         Route::resource('sections', SectionController::class);
