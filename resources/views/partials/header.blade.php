@@ -50,17 +50,6 @@
                     </a>
                 @endif
 
-                @if(auth()->user()->role === 'student')
-                    <a href="{{ route('student.dashboard') }}"
-                       class="{{ request()->routeIs('student.dashboard') ? 'text-[#FFD700] font-semibold border-b-2 border-[#FFD700]' : 'text-gray-200 hover:text-[#FFD700] font-medium' }} pb-1">
-                        My Exams
-                    </a>
-                    <a href="{{ route('student.results') }}"
-                       class="{{ request()->routeIs('student.results') ? 'text-[#FFD700] font-semibold border-b-2 border-[#FFD700]' : 'text-gray-200 hover:text-[#FFD700] font-medium' }} pb-1">
-                        Results
-                    </a>
-                @endif
-
             </nav>
 
             <div class="flex items-center border-l border-white/20 pl-5 relative group">
