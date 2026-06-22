@@ -41,6 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:student')->prefix('student')->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('student.dashboard');
         Route::get('results', [ExamController::class, 'results'])->name('student.results');
+        Route::get('results/{session}', [ExamController::class, 'resultShow'])->name('student.results.show');
         Route::get('exams/{exam}', [ExamController::class, 'show'])->name('student.exams.show');
         Route::post('exams/{exam}/start', [ExamController::class, 'start'])->name('student.exams.start');
         Route::post('exams/{exam}/submit', [ExamController::class, 'submit'])->name('student.exams.submit');

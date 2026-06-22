@@ -35,6 +35,10 @@ class DashboardController extends Controller
             ->limit(4)
             ->get();
 
+        $scoresByExam = $student->examSessions()
+            ->whereNotNull('submitted_at')
+            ->pluck('score', 'exam_id');
+
         $classes = $student->sections()->with('subject')->orderBy('name')->get();
 
         return view('student.dashboard', compact(
@@ -42,7 +46,8 @@ class DashboardController extends Controller
             'upcomingExams',
             'assignedCount',
             'recentSessions',
-            'classes'
+            'classes',
+            'scoresByExam'
         ));
     }
 }
