@@ -9,7 +9,7 @@
 <body class="bg-gray-100 text-gray-900 font-sans antialiased flex flex-col min-h-screen">
 
     @if(request()->routeIs('student.exams.*')) 
-        @include('partials.header-exam')
+        @include('partials.header-exam', ['exam' => request()->route('exam') ?? null])
     @elseif(auth()->check()) 
         @include('partials.header')
     @else 

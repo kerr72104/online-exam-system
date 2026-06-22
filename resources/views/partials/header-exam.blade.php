@@ -4,7 +4,7 @@
             
             <div class="flex items-center space-x-4">
                 <h1 class="font-bold text-lg hidden sm:block">
-                    {{ $exam->title ?? 'COMP 20133 - Software Engineering' }}
+                    {{ optional($exam)->title ?? 'COMP 20133 - Software Engineering' }}
                 </h1>
                 <div class="border-l border-white/20 h-6"></div>
             </div>
@@ -19,7 +19,7 @@
                     </span>
                 </div>
 
-                <form action="{{ route('student.exams.submit', $exam->id) }}" method="POST" id="exam-submit-form" class="m-0 p-0">
+                <form action="{{ route('student.exams.submit', optional($exam)->id) }}" method="POST" id="exam-submit-form" class="m-0 p-0">
                     @csrf
                     <button type="submit" class="bg-white text-[#880000] font-bold px-4 py-1.5 rounded-md hover:bg-gray-100 transition-colors text-sm">
                         Finish Exam
@@ -33,7 +33,7 @@
 
 <script>
     // Grab duration from database, convert to seconds (fallback to 90 mins if missing)
-    let timeRemaining = {{ $exam->duration_minutes ?? 90 }} * 60; 
+    let timeRemaining = {{ optional($exam)->duration_minutes ?? 90 }} * 60; 
     
     const timerElement = document.getElementById('exam-timer');
 
