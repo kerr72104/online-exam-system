@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class SubjectController extends Controller
 {
@@ -31,6 +32,11 @@ class SubjectController extends Controller
 
         Subject::create($validated);
 
+        Log::info('Admin created subject.', [
+            'code' => $validated['code'],
+            'teacher_id' => $validated['teacher_id'],
+        ]);
+
         return redirect()->route('admin.subjects.index')
                          ->with('success', 'Subject created successfully.');
     }
@@ -51,6 +57,12 @@ class SubjectController extends Controller
 
         $subject->update($validated);
 
+        Log::info('Admin updated subject.', [
+            'subject_id' => $subject->id,
+            'code' => $validated['code'],
+            'teacher_id' => $validated['teacher_id'],
+        ]);
+
         return redirect()->route('admin.subjects.index')
                          ->with('success', 'Subject updated successfully.');
     }
@@ -58,6 +70,12 @@ class SubjectController extends Controller
     public function destroy(Subject $subject)
     {
         $subject->delete();
+
+        Log::info('Admin deleted subject.', [
+            'subject_id' => $subject->id,
+            'code' => $subject->code,
+        ]);
+
         return redirect()->route('admin.subjects.index')
                          ->with('success', 'Subject deleted.');
     }

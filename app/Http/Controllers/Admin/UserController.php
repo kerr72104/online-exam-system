@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -40,6 +41,11 @@ class UserController extends Controller
             'role'     => $validated['role'],
         ]);
 
+        Log::info('Admin created user.', [
+            'email' => $validated['email'],
+            'role' => $validated['role'],
+        ]);
+
         return redirect()->route('admin.users.index')
                          ->with('success', 'User created successfully.');
     }
@@ -68,6 +74,13 @@ class UserController extends Controller
             $user->update(['password' => Hash::make($validated['password'])]);
         }
 
+        Log::info('Admin updated user.', [
+            'user_id' => $user->id,
+            'email' => $validated['email'],
+            'role' => $validated['role'],
+            'password_changed' => !empty($validated['password']),
+        ]);
+
         return redirect()->route('admin.users.index')
                          ->with('success', 'User updated successfully.');
     }
@@ -75,6 +88,12 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $user->delete();
+
+        Log::info('Admin deleted user.', [
+            'user_id' => $user->id,
+            'email' => $user->email,
+        ]);
+
         return redirect()->route('admin.users.index')
                          ->with('success', 'User deleted.');
     }

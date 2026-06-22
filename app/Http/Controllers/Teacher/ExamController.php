@@ -11,6 +11,7 @@ use App\Models\Section;
 use App\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ExamController extends Controller
 {
@@ -60,6 +61,14 @@ class ExamController extends Controller
         foreach ($validated['questions'] as $questionId) {
             $exam->questions()->attach($questionId, ['order' => $order++]);
         }
+
+        Log::info('Teacher created exam.', [
+            'teacher_id' => Auth::id(),
+            'exam_id' => $exam->id,
+            'title' => $exam->title,
+            'question_count' => count($validated['questions']),
+            'status' => $exam->status,
+        ]);
 
         return redirect()->route('teacher.exams.index')
                          ->with('success', 'Exam created successfully.');
@@ -113,6 +122,13 @@ class ExamController extends Controller
             $exam->questions()->attach($questionId, ['order' => $order++]);
         }
 
+        Log::info('Teacher updated exam.', [
+            'teacher_id' => Auth::id(),
+            'exam_id' => $exam->id,
+            'title' => $validated['title'],
+            'question_count' => count($validated['questions']),
+        ]);
+
         return redirect()->route('teacher.exams.index')
                          ->with('success', 'Exam updated successfully.');
     }
@@ -121,6 +137,11 @@ class ExamController extends Controller
     {
         $this->authorize('delete', $exam);
         $exam->delete();
+
+        Log::info('Teacher deleted exam.', [
+            'teacher_id' => Auth::id(),
+            'exam_id' => $exam->id,
+        ]);
 
         return redirect()->route('teacher.exams.index')
                          ->with('success', 'Exam deleted.');
@@ -135,6 +156,12 @@ class ExamController extends Controller
         }
 
         $exam->update(['status' => 'published']);
+
+        Log::info('Teacher published exam.', [
+            'teacher_id' => Auth::id(),
+            'exam_id' => $exam->id,
+            'title' => $exam->title,
+        ]);
 
         return redirect()->route('teacher.exams.index')
                          ->with('success', 'Exam published successfully.');

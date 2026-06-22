@@ -10,12 +10,21 @@
             <p class="text-gray-500 text-sm mt-1">Login to your account to continue</p>
         </div>
 
-        <form method="POST" action="{{ route('login') }}" class="space-y-4">
+        @if(session('error'))
+            <div class="rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        <form method="POST" action="{{ route('login') }}" class="space-y-4" novalidate>
             @csrf
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input type="email" name="email" value="{{ old('email') }}" required
                     class="w-full border border-gray-300 rounded-lg px-4 py-2 ">
+                @error('email')
+                    <p class="text-red-500 text-xs mt-1 font-medium">{{ $message }}</p>
+                @enderror
             </div>
 
             <div>
@@ -24,6 +33,9 @@
                 </div>
                 <input type="password" name="password" required
                     class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                @error('password')
+                    <p class="text-red-500 text-xs mt-1 font-medium">{{ $message }}</p>
+                @enderror
             </div>
 
             <button type="submit" class="w-full bg-[#880000] text-white py-2.5 rounded-lg font-bold hover:bg-[#660000] mt-2 cursor-pointer">

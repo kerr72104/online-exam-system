@@ -7,6 +7,8 @@ use App\Models\Exam;
 use App\Models\ExamSession;
 use App\Models\StudentAnswer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ExamController extends Controller
 {
