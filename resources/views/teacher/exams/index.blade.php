@@ -63,21 +63,21 @@
 
                                         @if($exam->status === 'draft')
                                             <a href="{{ route('teacher.exams.edit', $exam) }}"
-                                               class="text-blue-600 text-xs font-medium hover:underline">Edit</a>
+                                                class="text-blue-600 text-xs font-medium hover:underline">Edit</a>
 
                                             <form method="POST" action="{{ route('teacher.exams.publish', $exam) }}"
-                                                  onsubmit="return confirm('Publish this exam? It cannot be edited after publishing.')">
+                                                onsubmit="return confirm('Publish this exam? It cannot be edited after publishing.')">
                                                 @csrf
                                                 <button type="submit" class="text-green-600 text-xs font-medium hover:underline">Publish</button>
                                             </form>
-
-                                            <form method="POST" action="{{ route('teacher.exams.destroy', $exam) }}"
-                                                  onsubmit="return confirm('Delete this exam?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-500 text-xs font-medium hover:underline">Delete</button>
-                                            </form>
                                         @endif
+                                        
+                                        <form method="POST" action="{{ route('teacher.exams.destroy', $exam) }}"
+                                            onsubmit="return confirm('Delete this exam?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-500 text-xs font-medium hover:underline">Delete</button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>

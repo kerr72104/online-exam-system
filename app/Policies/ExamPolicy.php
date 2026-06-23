@@ -19,7 +19,7 @@ class ExamPolicy
 
     public function delete(User $user, Exam $exam): bool
     {
-        return $user->id === $exam->teacher_id && $exam->status === 'draft';
+        return $user->id === $exam->teacher_id; //&& $exam->status === 'draft';
     }
 
     public function publish(User $user, Exam $exam): bool
