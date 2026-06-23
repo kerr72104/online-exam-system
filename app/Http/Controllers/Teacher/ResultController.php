@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Exam;
 use App\Models\ExamSession;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ResultController extends Controller
 {
@@ -17,7 +18,7 @@ class ResultController extends Controller
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($exam) {
-                $exam->total_students   = $exam->section->students()->count();
+                $exam->total_students   = $exam->section?->students()->count() ?? 0;
                 $exam->submitted_count  = $exam->sessions->whereIn('status', ['submitted', 'graded'])->count();
                 $exam->avg_score        = $exam->sessions->whereNotNull('score')->avg('score');
                 $exam->highest_score    = $exam->sessions->whereNotNull('score')->max('score');
@@ -44,7 +45,7 @@ class ResultController extends Controller
         $questionCount = $exam->questions->count();
 
         $stats = [
-            'total_students'  => $exam->section->students()->count(),
+            'total_students'  => $exam->section?->students()->count() ?? 0,
             'submitted_count' => $sessions->count(),
             'avg_score'       => round($sessions->avg('score'), 1),
             'highest_score'   => $sessions->max('score'),

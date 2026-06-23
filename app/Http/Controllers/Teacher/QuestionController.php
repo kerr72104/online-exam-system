@@ -8,6 +8,7 @@ use App\Models\Question;
 use App\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class QuestionController extends Controller
 {
@@ -47,6 +48,13 @@ class QuestionController extends Controller
             ]);
         }
 
+        Log::info('Teacher created question.', [
+            'teacher_id' => Auth::id(),
+            'question_id' => $question->id,
+            'subject_id' => $validated['subject_id'],
+            'choice_count' => count($validated['choices']),
+        ]);
+
         return redirect()->route('teacher.questions.index')
                          ->with('success', 'Question created successfully.');
     }
@@ -78,6 +86,13 @@ class QuestionController extends Controller
             ]);
         }
 
+        Log::info('Teacher updated question.', [
+            'teacher_id' => Auth::id(),
+            'question_id' => $question->id,
+            'subject_id' => $validated['subject_id'],
+            'choice_count' => count($validated['choices']),
+        ]);
+
         return redirect()->route('teacher.questions.index')
                          ->with('success', 'Question updated successfully.');
     }
@@ -86,6 +101,11 @@ class QuestionController extends Controller
     {
         $this->authorize('delete', $question);
         $question->delete();
+
+        Log::info('Teacher deleted question.', [
+            'teacher_id' => Auth::id(),
+            'question_id' => $question->id,
+        ]);
 
         return redirect()->route('teacher.questions.index')
                          ->with('success', 'Question deleted.');

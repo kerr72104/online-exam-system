@@ -7,6 +7,7 @@ use App\Models\Section;
 use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class SectionController extends Controller
 {
@@ -41,6 +42,13 @@ class SectionController extends Controller
             $section->students()->sync($validated['students']);
         }
 
+        Log::info('Admin created section.', [
+            'section_id' => $section->id,
+            'name' => $section->name,
+            'subject_id' => $section->subject_id,
+            'student_count' => count($validated['students'] ?? []),
+        ]);
+
         return redirect()->route('admin.sections.index')
                          ->with('success', 'Section created successfully.');
     }
@@ -69,6 +77,13 @@ class SectionController extends Controller
 
         $section->students()->sync($validated['students'] ?? []);
 
+        Log::info('Admin updated section.', [
+            'section_id' => $section->id,
+            'name' => $validated['name'],
+            'subject_id' => $validated['subject_id'],
+            'student_count' => count($validated['students'] ?? []),
+        ]);
+
         return redirect()->route('admin.sections.index')
                          ->with('success', 'Section updated successfully.');
     }
@@ -76,6 +91,12 @@ class SectionController extends Controller
     public function destroy(Section $section)
     {
         $section->delete();
+
+        Log::info('Admin deleted section.', [
+            'section_id' => $section->id,
+            'name' => $section->name,
+        ]);
+
         return redirect()->route('admin.sections.index')
                          ->with('success', 'Section deleted.');
     }
