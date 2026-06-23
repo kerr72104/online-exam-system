@@ -17,16 +17,24 @@ class DashboardController extends Controller
         $student = Auth::user();
         $sectionIds = $student->sections()->pluck('id');
 
+        $completedExamIds = $student->examSessions()
+            ->whereNotNull('submitted_at')
+            ->pluck('exam_id')
+            ->unique()
+            ->toArray();
+
         $upcomingExams = Exam::with(['subject', 'section', 'teacher'])
             ->whereIn('section_id', $sectionIds)
             ->where('status', 'published')
             ->where('ends_at', '>=', now())
+            ->whereNotIn('id', $completedExamIds)
             ->orderBy('starts_at')
             ->limit(8)
             ->get();
 
         $assignedCount = Exam::whereIn('section_id', $sectionIds)
             ->where('status', 'published')
+            ->whereNotIn('id', $completedExamIds)
             ->count();
 
         $recentSessions = $student->examSessions()

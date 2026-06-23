@@ -24,6 +24,28 @@ class ExamController extends Controller
         return view('student.results', compact('session'));
     }
 
+    public function resultShow(ExamSession $session)
+    {
+        abort_unless($session->student_id === auth()->id(), 403);
+
+        $session->load(['exam.questions.choices', 'answers.choice']);
+
+        return view('student.results', compact('session'));
+    }
+
+    public function start(Exam $exam)
+    {
+        ExamSession::firstOrCreate([
+            'exam_id' => $exam->id,
+            'student_id' => auth()->id(),
+        ], [
+            'started_at' => now(),
+            'status' => 'in_progress',
+        ]);
+
+        return redirect()->route('student.exams.show', $exam);
+    }
+
     public function show(Exam $exam)
     {
         return view('student.exams.show', compact('exam'));
