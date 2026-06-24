@@ -18,6 +18,7 @@ class ExamController extends Controller
             ->examSessions()
             ->with(['exam.questions', 'answers.choice'])
             ->whereNotNull('submitted_at')
+            ->whereHas('exam')
             ->latest('submitted_at')
             ->first();
 
@@ -29,6 +30,7 @@ class ExamController extends Controller
         abort_unless($session->student_id === auth()->id(), 403);
 
         $session->load(['exam.questions.choices', 'answers.choice']);
+        abort_if(!$session->exam, 404);
 
         return view('student.results', compact('session'));
     }

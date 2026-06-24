@@ -40,12 +40,14 @@ class DashboardController extends Controller
         $recentSessions = $student->examSessions()
             ->with('exam.subject', 'exam.section')
             ->whereNotNull('submitted_at')
+            ->whereHas('exam')
             ->orderBy('submitted_at', 'desc')
             ->limit(4)
             ->get();
 
         $scoresByExam = $student->examSessions()
             ->whereNotNull('submitted_at')
+            ->whereHas('exam')
             ->pluck('score', 'exam_id');
 
         $classes = $student->sections()->with('subject')->orderBy('name')->get();
