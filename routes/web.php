@@ -44,6 +44,8 @@ Route::middleware('auth')->group(function () {
         Route::get('results/{session}', [ExamController::class, 'resultShow'])->name('student.results.show');
         Route::get('exams/{exam}', [ExamController::class, 'show'])->name('student.exams.show');
         Route::post('exams/{exam}/start', [ExamController::class, 'start'])->name('student.exams.start');
+        Route::post('exams/{exam}/autosave', [ExamController::class, 'autosave'])->name('student.exams.autosave');
+        Route::get('exams/{exam}/status', [ExamController::class, 'status'])->name('student.exams.status');
         Route::post('exams/{exam}/submit', [ExamController::class, 'submit'])->name('student.exams.submit');
     });
 });
