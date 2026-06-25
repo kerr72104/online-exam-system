@@ -3,7 +3,7 @@
 @section('title', 'My Classroom')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 h-screen flex flex-col">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 min-h-screen flex flex-col">
     <div class="flex flex-col gap-6 flex-1 min-h-0">
         
         <section class="flex-shrink-0 rounded-[32px] border border-gray-200 bg-white p-6 shadow-sm">
@@ -64,8 +64,8 @@
                                     </div>
 
                                     <div class="flex flex-col items-start gap-2 sm:items-end">
-                                        <span class="inline-flex rounded-full border px-3 py-1 text-xs font-semibold {{ $isOpen ? 'bg-green-50 text-green-700 border-green-200' : ($score ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : ($startsSoon ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-gray-50 text-gray-600 border-gray-200')) }}">
-                                            {{ $isOpen ? 'Open now' : ($score ? ($score . ' pts') : ($startsSoon ? 'Starts soon' : 'Closed')) }}
+                                        <span class="inline-flex rounded-full border px-3 py-1 text-xs font-semibold {{ $isOpen ? 'bg-green-50 text-green-700 border-green-200' : 'bg-blue-50 text-blue-700 border-blue-200' }}">
+                                            {{ $isOpen ? 'Open now' : 'Starts soon' }}
                                         </span>
                                         <p class="text-sm text-gray-500">Teacher: {{ $exam->teacher->name ?? 'TBD' }}</p>
                                     </div>
@@ -88,9 +88,18 @@
 
                                 <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                     <p class="text-sm text-gray-500">{{ $exam->subject->code ?? 'SUBJ' }} • {{ $exam->section->name ?? 'Section' }}</p>
-                                    <a href="{{ route('student.exams.show', $exam) }}" class="inline-flex items-center justify-center rounded-full bg-[#880000] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#6a0000]">
-                                        {{ $isOpen ? 'Take Exam' : ($startsSoon ? 'Preview' : 'Review') }}
-                                    </a>
+                                    @if($isOpen)
+                                        <a href="{{ route('student.exams.show', $exam) }}" class="inline-flex items-center justify-center rounded-full bg-[#880000] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#6a0000]">
+                                            Take Exam
+                                        </a>
+                                    @else
+                                        <span class="exam-opens inline-flex items-center justify-center rounded-full border border-gray-200 bg-gray-100 px-5 py-2 text-sm font-semibold text-gray-500"
+                                              data-start="{{ $exam->starts_at->timestamp }}"
+                                              data-end="{{ $exam->ends_at->timestamp }}"
+                                              data-url="{{ route('student.exams.show', $exam) }}">
+                                            Opens {{ $exam->starts_at->format('M d, h:i A') }}
+                                        </span>
+                                    @endif
                                 </div>
                             </article>
                         @empty
@@ -159,3 +168,35 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    // Replace 'Opens' labels with Take Exam button when start time is reached
+    (function(){
+        const opensEls = Array.from(document.querySelectorAll('.exam-opens'));
+        if (!opensEls.length) return;
+
+        function checkStarts(){
+            const now = Math.floor(Date.now()/1000);
+            opensEls.forEach(el => {
+                if (!el) return;
+                const start = parseInt(el.dataset.start,10) || 0;
+                const end = parseInt(el.dataset.end,10) || 0;
+                if (now >= start && now <= end){
+                    // create anchor
+                    const url = el.dataset.url;
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.className = 'inline-flex items-center justify-center rounded-full bg-[#880000] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#6a0000]';
+                    a.textContent = 'Take Exam';
+                    el.replaceWith(a);
+                }
+            });
+        }
+
+        // check immediately and then every second
+        checkStarts();
+        setInterval(checkStarts, 1000);
+    })();
+</script>
+@endpush

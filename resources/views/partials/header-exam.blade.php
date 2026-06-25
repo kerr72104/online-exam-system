@@ -37,13 +37,52 @@
     
     const timerElement = document.getElementById('exam-timer');
 
+    // Autosave/submit config
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    const autosaveUrl = '{{ isset($exam) ? route('student.exams.autosave', optional($exam)->id) : '' }}';
+
+    function collectAnswers(){
+        const data = {};
+        try{
+            const form = document.getElementById('examForm');
+            if (!form) return data;
+            const inputs = form.querySelectorAll('input[type="radio"]');
+            inputs.forEach(i => {
+                if (i.checked){
+                    const name = i.name; // answers[123]
+                    const match = name.match(/answers\[(\d+)\]/);
+                    if (match) data[match[1]] = parseInt(i.value);
+                }
+            });
+        }catch(e){}
+        return data;
+    }
+
     const countdown = setInterval(() => {
         if (timeRemaining <= 0) {
             clearInterval(countdown);
             timerElement.innerHTML = "00:00:00";
             
-            // Add your auto-submit logic here later
-            alert("Time is up! Your exam will now be submitted.");
+            // Auto-save current answers then submit the exam
+            try{
+                if (autosaveUrl){
+                    const payloadObj = { answers: collectAnswers(), _token: csrf };
+                    const blob = new Blob([JSON.stringify(payloadObj)], { type: 'application/json' });
+                    // Use sendBeacon to persist answers even if unload is happening
+                    navigator.sendBeacon(autosaveUrl, blob);
+                }
+            }catch(e){}
+
+            // Submit the exam form if present, otherwise submit header fallback
+            setTimeout(()=>{
+                const examForm = document.getElementById('examForm');
+                if (examForm){
+                    examForm.submit();
+                } else {
+                    const headerSubmit = document.getElementById('exam-submit-form');
+                    if (headerSubmit) headerSubmit.submit();
+                }
+            }, 250);
             return;
         }
 
